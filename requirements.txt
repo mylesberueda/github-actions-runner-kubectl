@@ -1,0 +1,10 @@
+# Requirements for the Docker build and push script
+# No additional Python packages required - uses only standard library
+# The script uses subprocess to call docker CLI commands directly
+
+# Optional: If you want to use the docker Python library instead of CLI
+# docker>=6.0.0
+
+# For development/testing
+# pytest>=7.0.0
+# pytest-cov>=4.0.0

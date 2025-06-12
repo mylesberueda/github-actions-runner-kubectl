@@ -1,0 +1,6 @@
+# Copy this file: `cp mise.example.toml mise.local.toml`
+# Edit the environment variables below
+# Run the python script: `python build_and_push.py --tags latest`
+[env]
+REGISTRY_USERNAME = "<your github username>"
+REGISTRY_PASSWORD = "<your personal access token>"
