@@ -21,16 +21,22 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 # Install helm (useful for your infrastructure)
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-# Install mise, for managing language versions
-RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
-RUN mise use --global node@latest python@latest pnpm@latest
-
 # Verify installations
 RUN kubectl version --client \
   && helm version
 
-# Switch back to runner user
-USER runner
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV MISE_DATA_DIR="/mise"
+ENV MISE_CONFIG_DIR="/mise"
+ENV MISE_CACHE_DIR="/mise/cache"
+ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
+ENV PATH="/mise/shims:$PATH"
 
-# Set working directory
-WORKDIR /home/runner
+# Install mise globally (as root)
+RUN curl https://mise.run | sh 
+RUN mise use --global node@latest python@latest pnpm@latest
+
+# Fix permissions for mise directory so runner user can access tools
+RUN chown -R runner:runner /mise
+
+USER runner
