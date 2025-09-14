@@ -23,7 +23,7 @@ RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | b
 
 # Install mise, for managing language versions
 RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
-RUN mise use --global node@latest python@latest
+RUN mise use --global node@latest python@latest pnpm@latest
 
 # Verify installations
 RUN kubectl version --client \
