@@ -1,0 +1,57 @@
+[env]
+IMAGE_NAME = "github-actions-runner-kubectl"
+REGISTRY_URL = "ghcr.io"
+
+[tasks.login]
+description = "Login to container registry"
+run = """
+echo "$REGISTRY_PASSWORD" | docker login $REGISTRY_URL -u $REGISTRY_USERNAME --password-stdin
+"""
+
+[tasks.build]
+description = "Build the Docker image"
+run = """
+docker build -t $REGISTRY_URL/$REGISTRY_USERNAME/$IMAGE_NAME:${TAG:-latest} .
+"""
+
+[tasks.push]
+description = "Push the Docker image"
+depends = ["login"]
+run = """
+docker push $REGISTRY_URL/$REGISTRY_USERNAME/$IMAGE_NAME:${TAG:-latest}
+"""
+
+[tasks.release]
+description = "Build and push the Docker image"
+depends = ["build", "push"]
+
+[tasks."build:tagged"]
+description = "Build with a specific tag (requires TAG env var)"
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${TAG:-}" ]]; then
+  echo "Error: TAG environment variable is required"
+  echo "Usage: TAG=v1.0.0 mise run build:tagged"
+  exit 1
+fi
+
+docker build -t $REGISTRY_URL/$REGISTRY_USERNAME/$IMAGE_NAME:$TAG .
+"""
+
+[tasks."release:tagged"]
+description = "Build and push with a specific tag (requires TAG env var)"
+depends = ["build:tagged"]
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${TAG:-}" ]]; then
+  echo "Error: TAG environment variable is required"
+  echo "Usage: TAG=v1.0.0 mise run release:tagged"
+  exit 1
+fi
+
+docker push $REGISTRY_URL/$REGISTRY_USERNAME/$IMAGE_NAME:$TAG
+"""
