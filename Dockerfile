@@ -8,6 +8,8 @@ USER root
 RUN apt-get update && apt-get install -y \
   build-essential \
   wget \
+  pkg-config \
+  libssl-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Install kubectl
